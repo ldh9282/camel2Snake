@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>sql2Excel</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.2/xlsx.full.min.js"></script>
+
+    <style>
+        #content {
+            width: 80%;
+            max-width: 1000px;
+            height: 500px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-40%, -50%);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="content">
+        <p>
+            <textarea id="sqlTextarea" cols="100" rows="10"></textarea>
+        </p>
+        <p>
+            <button onclick="previewData()">미리보기</button>
+            <button onclick="generateExcel()">엑셀다운</button>
+        </p>
+        <div id="previewTable"></div>
+    </div>
+
+    <script>
+        function convertToCamelCase(snake_str) {
+            const components = snake_str.split('_');
+            return components[0].toLowerCase() + components.slice(1).map(x => x.charAt(0).toUpperCase() + x.slice(1).toLowerCase()).join('');
+        }
+
+        function processLine(line) {
+            const regex = / AS /gi;
+            const regexKr = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/g;
+            const columns = [];
+            let match;
+            while ((match = regex.exec(line)) !== null) {
+                let columnName = match.input.split(regex)[0].trim();
+                let columnNameKr = '';
+                for (let i = 0; i < columnName.length; i++) {
+                    const ch = columnName.charAt(i);
+                    // Check if the character is a Korean character using a regular expression
+                    if (/[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/.test(ch)) {
+                        columnNameKr += ch;
+                    }
+                }
+                columnName = columnNameKr;
+
+                let aliasName = match.input.split(regex)[1].trim();
+
+                columns.push({
+                    columnName: columnName,
+                    alias: aliasName,
+                    camelCase: convertToCamelCase(aliasName)
+                });
+            }
+            return columns;
+        }
+
+        function extractColumns(sqlQuery) {
+            const lines = sqlQuery.split('\n');
+            let columns = [];
+            lines.forEach(line => {
+                line = line.replaceAll('\t', '').replaceAll(',', '');
+                columns = columns.concat(processLine(line));
+            });
+            console.log(`Extracted columns: ${JSON.stringify(columns)}`);
+            return columns;
+        }
+
+        function previewData() {
+            const sqlQuery = document.getElementById('sqlTextarea').value;
+            const columns = extractColumns(sqlQuery);
+
+            const previewTable = document.getElementById('previewTable');
+            previewTable.innerHTML = '';
+
+            if (columns.length > 0) {
+                const table = document.createElement('table');
+                table.border = '1';
+                table.id = 'columnsTable';
+
+                const headerRow = table.insertRow();
+                ['columnName', 'columnCamelName', 'columnSnakeName', ''].forEach(text => {
+                    const cell = document.createElement('th');
+                    cell.textContent = text;
+                    headerRow.appendChild(cell);
+                });
+
+                columns.forEach((col) => {
+                    const row = table.insertRow();
+                    row.setAttribute('id', col.columnName);
+                    row.insertCell().textContent = col.columnName;
+                    row.insertCell().textContent = col.camelCase;
+                    row.insertCell().textContent = col.alias;
+
+                    const actionsCell = row.insertCell();
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = '삭제';
+                    deleteButton.onclick = () => deleteRow(col.columnName);
+                    actionsCell.appendChild(deleteButton);
+                });
+
+                previewTable.appendChild(table);
+            } else {
+                previewTable.textContent = 'No columns found.';
+            }
+        }
+
+        function deleteRow(columnName) {
+            document.getElementById(columnName).remove();
+
+            const table = document.getElementById('columnsTable');
+            if (table.rows.length === 1) {
+
+                const previewTable = document.getElementById('previewTable');
+                previewTable.textContent = 'No columns found.';
+
+            }
+        }
+
+        function generateExcel() {
+            const table = document.getElementById('columnsTable');
+            const columns = [];
+
+            for (let i = 1; i < table.rows.length; i++) {
+                const row = table.rows[i];
+                columns.push({
+                    columnName: row.cells[0].textContent,
+                    camelCase: row.cells[1].textContent,
+                    alias: row.cells[2].textContent
+                });
+            }
+
+            const worksheetData = columns.map(col => [
+                col.columnName,
+                col.camelCase,
+                col.alias
+            ]);
+
+            const worksheet = XLSX.utils.aoa_to_sheet([
+                ['columnName', 'columnCamelName', 'columnSnakeName'],
+                ...worksheetData
+            ]);
+
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Columns');
+
+            XLSX.writeFile(workbook, 'columns.xlsx');
+        }
+
+
+
+    </script>
+</body>
+
+</html>
