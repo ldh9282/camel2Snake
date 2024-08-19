@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>termList</title>
+    <style>
+        div {
+            margin-bottom: 10px;
+        }
+
+        #searchForm {
+            margin-top: 5%;
+            margin-left: 30%;
+        }
+
+        #result {
+            margin-left: 10%;
+            margin-right: 10%;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        #result::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        #result::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        #result::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+
+        #result::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        #btn-search {
+            margin-left: 20px;
+        }
+
+        label {
+            min-width: 100px;
+            font-size: 16px;
+            color: #333;
+            display: block;
+            margin-bottom: 8px;
+
+            display: inline-block;
+            margin-right: 5px;
+
+            font-family: Arial, sans-serif;
+            letter-spacing: 1px;
+        }
+
+        input[type="text"] {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 8px;
+            font-size: 16px;
+
+            width: 100%;
+            max-width: 400px;
+            height: 30px;
+        }
+
+        input[type="text"]:focus {
+            border-color: #66afe9;
+            outline: none;
+            box-shadow: 0 0 5px rgba(102, 175, 233, 0.5);
+        }
+
+        button {
+            background-color: #077bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #ddd;
+        }
+
+        thead tr th {
+            position: sticky;
+            top: -1px;
+            background-color: #f4f4f4;
+            padding: 12px;
+            border-bottom: 2px solid #ddd;
+            text-align: center;
+        }
+
+        tbody tr td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tbody tr {
+            display: none;
+        }
+
+        tbody tr.show {
+            display: table-row;
+        }
+
+        @media (max-width: 1280px) {
+            #searchForm {
+                margin-top: 5%;
+                margin-left: 25%;
+            }
+
+            #result {
+                margin-left: 10%;
+                margin-right: 10%;
+            }
+
+            label {
+                min-width: 100px;
+                font-size: 14px;
+                margin-bottom: 8px;
+
+                margin-right: 5px;
+                letter-spacing: 1px;
+            }
+
+            input[type="text"] {
+                font-size: 14px;
+
+                width: 100%;
+                max-width: 250px;
+                height: 25px;
+            }
+
+            input[type="text"]:focus {
+                font-size: 14px;
+
+                width: 100%;
+                max-width: 250px;
+                height: 25px;
+            }
+
+            button {
+                padding: 8px 12px;
+                font-size: 12px;
+
+            }
+
+            thead tr th {
+                min-width: 140px;
+                font-size: 12px;
+            }
+
+            tbody tr td {
+                min-width: 140px;
+                font-size: 12px;
+            }
+
+            #result::-webkit-scrollbar {
+                width: 10px;
+                height: 10px;
+            }
+
+            #result::-webkit-scrollbar-thumb {
+                border-radius: 10px;
+            }
+
+            #btn-search {
+                margin-left: 10px;
+            }
+        }
+
+        @media (max-width: 762px) {
+            #searchForm {
+                margin-top: 5%;
+                margin-left: 20%;
+            }
+
+            #result {
+                margin-left: 10%;
+                margin-right: 10%;
+            }
+
+            label {
+                min-width: 80px;
+                font-size: 10px;
+                margin-bottom: 10px;
+
+                margin-right: 5px;
+                letter-spacing: 1px;
+            }
+
+            input[type="text"] {
+                font-size: 10px;
+
+                width: 100%;
+                max-width: 200px;
+                height: 10px;
+            }
+
+            input[type="text"]:focus {
+                font-size: 10px;
+
+                width: 100%;
+                max-width: 200px;
+                height: 10px;
+            }
+
+            button {
+                padding: 6px 12px;
+                font-size: 10px;
+
+            }
+
+            thead tr th {
+                min-width: 140px;
+                font-size: 10px;
+            }
+
+            tbody tr td {
+                min-width: 140px;
+                font-size: 10px;
+            }
+
+            #result::-webkit-scrollbar {
+                width: 6px;
+                height: 6px;
+            }
+
+            #result::-webkit-scrollbar-thumb {
+                border-radius: 6px;
+            }
+
+        }
+
+        @media (max-width: 600px) {
+            #searchForm {
+                margin-left: 10%;
+            }
+
+            #result {
+                margin-left: 0%;
+                margin-right: 0%;
+            }
+
+            thead tr th {
+                min-width: 140px;
+                font-size: 8px;
+            }
+
+            tbody tr td {
+                font-size: 8px;
+            }
+
+            #btn-search {
+                margin-top: 20px;
+                margin-bottom: 20px;
+                display: block;
+                width: 100%;
+                margin-left: 0%;
+            }
+
+        }
+    </style>
+</head>
+
+<body>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    document.querySelector('#btnSearch').click();
+                }
+            });
+
+            document.querySelector('#btnSearch').addEventListener('click', function () {
+                document.querySelectorAll('tbody tr').forEach((item) => {
+                    item.classList.remove('show');
+                });
+
+                let resultEl;
+
+                let termName = document.querySelector('#termName').value.trim();
+                let termCamelName = document.querySelector('#termCamelName').value.trim();
+                let termSnakeName = document.querySelector('#termSnakeName').value.trim();
+
+
+                document.querySelectorAll('tbody tr').forEach((item) => {
+                    let theTermName = item.querySelector('.termName').textContent.trim();
+                    let theTermCamelName = item.querySelector('.termCamelName').textContent.trim();
+                    let theTermSnakeName = item.querySelector('.termSnakeName').textContent.trim();
+
+                    if (!termName || theTermName.includes(termName)) {
+                        if (!termCamelName || theTermCamelName.includes(termCamelName)) {
+                            if (!termSnakeName || theTermSnakeName.includes(termSnakeName)) {
+                                item.classList.add('show');
+                            }
+                        }
+                    }
+                });
+            });
+        })
+    </script>
+
+    <div id="content">
+        <div id="searchForm">
+
+            <div>
+                <label for="termName">용어명:</label>
+                <input type="text" name="termName" id="termName">
+            </div>
+            <div>
+                <label for="termSnakeName">용어영문명:</label>
+                <input type="text" name="termSnakeName" id="termSnakeName">
+            </div>
+            <div>
+                <label for="termCamelName">용어카멜명:</label>
+                <input type="text" name="termCamelName" id="termCamelName">
+                <span id="btn-search">
+                    <button type="button" id="btnSearch">검색</button>
+                </span>
+            </div>
+        </div>
+
+        <div id="result">
+            <table>
+                <colgroup>
+                    <col style="width: 30%;">
+                    <col style="width: 30%;">
+                    <col style="width: auto;">
+                </colgroup>
+                <thead>
+                    <th scope="col">용어</th>
+                    <th scope="col">용어영문명</th>
+                    <th scope="col">용어카멜명</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="termName">쇼핑상품일련번호</td>
+                        <td class="termSnakeName">SHPN_PD_SNO</td>
+                        <td class="termCamelName">shpnPdSno</td>
+                    </tr>
+                    <tr>
+                        <td class="termName">쇼핑주문상태구분코드</td>
+                        <td class="termSnakeName">SHPN_ORDR_STS_DTCD</td>
+                        <td class="termCamelName">shpnOrdrStsDtcd</td>
+                    </tr>
+                    <tr>
+                        <td class="termName">쇼핑상품유형구분코드</td>
+                        <td class="termSnakeName">SHPN_PD_PT_DTCD</td>
+                        <td class="termCamelName">shpnPdPtDtcd</td>
+                    </tr>
+                    <tr>
+                        <td class="termName">쇼핑상품일련번호</td>
+                        <td class="termSnakeName">SHPN_PD_SNO</td>
+                        <td class="termCamelName">shpnPdSno</td>
+                    </tr>
+                    <tr>
+                        <td class="termName">쇼핑주문상태구분코드</td>
+                        <td class="termSnakeName">SHPN_ORDR_STS_DTCD</td>
+                        <td class="termCamelName">shpnOrdrStsDtcd</td>
+                    </tr>
+                    <tr>
+                        <td class="termName">쇼핑상품유형구분코드</td>
+                        <td class="termSnakeName">SHPN_PD_PT_DTCD</td>
+                        <td class="termCamelName">shpnPdPtDtcd</td>
+                    </tr>
+                    <tr>
+                        <td class="termName">쇼핑상품일련번호</td>
+                        <td class="termSnakeName">SHPN_PD_SNO</td>
+                        <td class="termCamelName">shpnPdSno</td>
+                    </tr>
+                    <tr>
+                        <td class="termName">쇼핑주문상태구분코드</td>
+                        <td class="termSnakeName">SHPN_ORDR_STS_DTCD</td>
+                        <td class="termCamelName">shpnOrdrStsDtcd</td>
+                    </tr>
+                    <tr>
+                        <td class="termName">쇼핑상품유형구분코드</td>
+                        <td class="termSnakeName">SHPN_PD_PT_DTCD</td>
+                        <td class="termCamelName">shpnPdPtDtcd</td>
+                    </tr>
+                    <tr>
+                        <td class="termName">쇼핑상품일련번호</td>
+                        <td class="termSnakeName">SHPN_PD_SNO</td>
+                        <td class="termCamelName">shpnPdSno</td>
+                    </tr>
+                    <tr>
+                        <td class="termName">쇼핑주문상태구분코드</td>
+                        <td class="termSnakeName">SHPN_ORDR_STS_DTCD</td>
+                        <td class="termCamelName">shpnOrdrStsDtcd</td>
+                    </tr>
+                    <tr>
+                        <td class="termName">쇼핑상품유형구분코드</td>
+                        <td class="termSnakeName">SHPN_PD_PT_DTCD</td>
+                        <td class="termCamelName">shpnPdPtDtcd</td>
+                    </tr>
+                    <tr>
+                        <td class="termName">쇼핑상품일련번호</td>
+                        <td class="termSnakeName">SHPN_PD_SNO</td>
+                        <td class="termCamelName">shpnPdSno</td>
+                    </tr>
+                    <tr>
+                        <td class="termName">쇼핑주문상태구분코드</td>
+                        <td class="termSnakeName">SHPN_ORDR_STS_DTCD</td>
+                        <td class="termCamelName">shpnOrdrStsDtcd</td>
+                    </tr>
+                    <tr>
+                        <td class="termName">쇼핑상품유형구분코드</td>
+                        <td class="termSnakeName">SHPN_PD_PT_DTCD</td>
+                        <td class="termCamelName">shpnPdPtDtcd</td>
+                    </tr>
+                    <tr>
+                        <td class="termName">쇼핑상품일련번호</td>
+                        <td class="termSnakeName">SHPN_PD_SNO</td>
+                        <td class="termCamelName">shpnPdSno</td>
+                    </tr>
+                    <tr>
+                        <td class="termName">쇼핑주문상태구분코드</td>
+                        <td class="termSnakeName">SHPN_ORDR_STS_DTCD</td>
+                        <td class="termCamelName">shpnOrdrStsDtcd</td>
+                    </tr>
+                    <tr>
+                        <td class="termName">쇼핑상품유형구분코드</td>
+                        <td class="termSnakeName">SHPN_PD_PT_DTCD</td>
+                        <td class="termCamelName">shpnPdPtDtcd</td>
+                    </tr>
+                    <tr>
+                        <td class="termName">쇼핑상품일련번호</td>
+                        <td class="termSnakeName">SHPN_PD_SNO</td>
+                        <td class="termCamelName">shpnPdSno</td>
+                    </tr>
+                    <tr>
+                        <td class="termName">쇼핑주문상태구분코드</td>
+                        <td class="termSnakeName">SHPN_ORDR_STS_DTCD</td>
+                        <td class="termCamelName">shpnOrdrStsDtcd</td>
+                    </tr>
+                    <tr>
+                        <td class="termName">쇼핑상품유형구분코드</td>
+                        <td class="termSnakeName">SHPN_PD_PT_DTCD</td>
+                        <td class="termCamelName">shpnPdPtDtcd</td>
+                    </tr>
+                    <tr>
+                        <td class="termName">쇼핑상품일련번호</td>
+                        <td class="termSnakeName">SHPN_PD_SNO</td>
+                        <td class="termCamelName">shpnPdSno</td>
+                    </tr>
+                    <tr>
+                        <td class="termName">쇼핑주문상태구분코드</td>
+                        <td class="termSnakeName">SHPN_ORDR_STS_DTCD</td>
+                        <td class="termCamelName">shpnOrdrStsDtcd</td>
+                    </tr>
+                    <tr>
+                        <td class="termName">쇼핑상품유형구분코드</td>
+                        <td class="termSnakeName">SHPN_PD_PT_DTCD</td>
+                        <td class="termCamelName">shpnPdPtDtcd</td>
+                    </tr>
+                    <tr>
+                        <td class="termName">쇼핑상품일련번호</td>
+                        <td class="termSnakeName">SHPN_PD_SNO</td>
+                        <td class="termCamelName">shpnPdSno</td>
+                    </tr>
+                    <tr>
+                        <td class="termName">쇼핑주문상태구분코드</td>
+                        <td class="termSnakeName">SHPN_ORDR_STS_DTCD</td>
+                        <td class="termCamelName">shpnOrdrStsDtcd</td>
+                    </tr>
+                    <tr>
+                        <td class="termName">쇼핑상품유형구분코드</td>
+                        <td class="termSnakeName">SHPN_PD_PT_DTCD</td>
+                        <td class="termCamelName">shpnPdPtDtcd</td>
+                    </tr>
+                    <tr>
+                        <td class="termName">쇼핑상품일련번호</td>
+                        <td class="termSnakeName">SHPN_PD_SNO</td>
+                        <td class="termCamelName">shpnPdSno</td>
+                    </tr>
+                    <tr>
+                        <td class="termName">쇼핑주문상태구분코드</td>
+                        <td class="termSnakeName">SHPN_ORDR_STS_DTCD</td>
+                        <td class="termCamelName">shpnOrdrStsDtcd</td>
+                    </tr>
+                    <tr>
+                        <td class="termName">쇼핑상품유형구분코드</td>
+                        <td class="termSnakeName">SHPN_PD_PT_DTCD</td>
+                        <td class="termCamelName">shpnPdPtDtcd</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+</body>
+
+</html>
