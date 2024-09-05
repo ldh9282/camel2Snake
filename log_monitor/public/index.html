@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log File Monitor</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            margin: 20px;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        #logContainer {
+            height: 75vh;
+            max-height: 75vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        pre {
+            font-family: 'Courier New', monospace;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 10px;
+            white-space: pre-wrap;
+            user-select: text;
+            height: 100%;
+            margin: 0;
+            box-sizing: border-box;
+            overflow: auto;
+        }
+
+
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+
+        /* Start downBtn */
+        #downBtn {
+            display: none;
+            position: fixed;
+            bottom: 30px;
+            right: 50%;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #fff;
+            border-color: #fff;
+            color: #444;
+            font-size: 25px;
+            text-align: center;
+            line-height: 35px;
+            border: none;
+            box-shadow: 2px 2px 5px -1px rgba(0, 0, 0, 0.6);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            z-index: 1000;
+            text-decoration: none;
+        }
+
+        #downBtn:hover {
+            transform: scale(1.1);
+        }
+
+        #downBtn.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* End downBtn */
+    </style>
+</head>
+
+<body>
+    <h1>Log File Monitor</h1>
+    <h3 id="filePath"></h3>
+    <div id="logContainer">
+        <pre id="logContent"></pre>
+    </div>
+    <a href="javascript:scrollToTop();" id="downBtn">↓</a>
+    <button onclick="clearConsole()">Clear Console</button>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        socket.on('logFilePath', (data) => {
+            document.getElementById('filePath').textContent = `[Log File Path] ${data}`;
+        });
+
+        socket.on('logUpdate', (data) => {
+            document.getElementById('logContent').textContent += '\n' + data;
+
+
+            document.getElementById('logContent').scrollTo({ top: document.getElementById('logContent').scrollHeight, behavior: "instant" });
+        });
+
+        function clearConsole() {
+            document.getElementById('logContent').textContent = '';
+        }
+
+        // Detect 'Ctrl + A' key press and select all text in the document.getElementById('logContent') element
+        document.addEventListener('keydown', (event) => {
+            if (event.ctrlKey && event.key === 'a' || event.ctrlKey && event.shiftKey && event.key === 'Insert') {
+                event.preventDefault();
+                const range = document.createRange();
+                const selection = window.getSelection();
+                range.selectNodeContents(document.getElementById('logContent'));
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
+
+            if (event.ctrlKey && event.key === 's') {
+                event.preventDefault(); // Prevent the default save action
+                clearConsole();
+            }
+        });
+
+        document.getElementById('logContent').addEventListener('scroll', () => {
+            const scrollTop = document.getElementById('logContent').scrollTop;
+            const scrollHeight = document.getElementById('logContent').scrollHeight;
+            const clientHeight = document.getElementById('logContent').clientHeight;
+
+            const threshold = 200;
+
+
+            if (scrollTop + clientHeight < scrollHeight - threshold) {
+                document.getElementById('downBtn').classList.add('show');
+            } else {
+                document.getElementById('downBtn').classList.remove('show');
+            }
+        });
+
+        function scrollToTop() {
+            document.getElementById('logContent').scrollTo({ top: document.getElementById('logContent').scrollHeight, behavior: 'smooth' });
+        }
+    </script>
+</body>
+
+</html>

@@ -30,3 +30,21 @@ select 쿼리 (스네이크 별칭)
 
 }
 ```
+
+## log_monitor
+
+기능상세
+
+1. 소켓으로 로그파일 실시간 모니터링을 브라우저에서 가능
+
+2. 단축키:
+
+    - [Ctrl + S] console clear
+
+    - [Ctrl + A] 전체선택
+
+3. cmd 에서 화면 및 node 서버실행
+
+```bash
+start http://localhost:3000 & node server.js [로그파일]
+```
