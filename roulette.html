@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>roulette</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        #roulette {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            border: 5px solid #333;
+            margin: 20px auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #pointer {
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 30px solid red;
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .section {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            background: #ccc;
+            transform-origin: 100% 100%;
+            clip-path: polygon(100% 100%, 0 100%, 100% 0);
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            color: black;
+            font-size: 12px;
+            text-align: center;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            padding-left: 10px;
+            /* Adjust for centering text within section */
+        }
+
+        .controls {
+            margin-top: 20px;
+        }
+
+        .controls button {
+            margin: 5px;
+        }
+
+        #items-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        #items-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px;
+            background: #f4f4f4;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+        }
+
+        #items-list li button {
+            background: red;
+            color: white;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="roulette">
+        <div id="pointer"></div>
+    </div>
+
+    <div class="controls">
+        <input type="text" id="item-input" placeholder="Enter item">
+        <button id="add-item">Add Item</button>
+        <button id="spin">Spin</button>
+        <button id="clear">Clear All</button>
+    </div>
+
+    <ul id="items-list">
+    </ul>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const roulette = document.getElementById('roulette');
+            const itemInput = document.getElementById('item-input');
+            const itemsList = document.getElementById('items-list');
+            let items = JSON.parse(localStorage.getItem('rouletteItems')) || [];
+            let isSpinning = false;
+
+            function saveToLocalStorage() {
+                localStorage.setItem('rouletteItems', JSON.stringify(items));
+            }
+
+            function updateRoulette() {
+                roulette.innerHTML = '<div id="pointer"></div>';
+                const angle = 360 / items.length;
+                items.forEach((item, index) => {
+                    const section = document.createElement('div');
+                    section.className = 'section';
+                    section.style.transform = `rotate(${angle * index}deg)`;
+                    section.style.background = `hsl(${index * (360 / items.length)}, 80%, 70%)`;
+                    section.innerText = item;
+                    section.addEventListener('click', () => {
+                        const newItem = prompt('Edit item:', item);
+                        if (newItem) {
+                            items[index] = newItem;
+                            saveToLocalStorage();
+                            updateRoulette();
+                            updateItemsList();
+                        }
+                    });
+                    roulette.appendChild(section);
+                });
+            }
+
+            function updateItemsList() {
+                itemsList.innerHTML = '';
+                items.forEach((item, index) => {
+                    const li = document.createElement('li');
+                    li.innerText = item;
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.innerText = 'Delete';
+                    deleteBtn.addEventListener('click', () => {
+                        items.splice(index, 1);
+                        saveToLocalStorage();
+                        updateRoulette();
+                        updateItemsList();
+                    });
+                    li.appendChild(deleteBtn);
+                    itemsList.appendChild(li);
+                });
+            }
+
+            document.getElementById('add-item').addEventListener('click', () => {
+                const newItem = itemInput.value.trim();
+                if (newItem) {
+                    items.push(newItem);
+                    saveToLocalStorage();
+                    updateRoulette();
+                    updateItemsList();
+                    itemInput.value = '';
+                }
+            });
+
+            document.getElementById('spin').addEventListener('click', () => {
+                if (isSpinning || items.length === 0) return;
+
+                const randomAngle = 360 * 3 + Math.floor(Math.random() * 360);
+                const winningIndex = Math.floor(((360 - (randomAngle % 360)) / (360 / items.length)) % items.length);
+
+                isSpinning = true;
+                roulette.style.transition = 'transform 3s ease-out';
+                roulette.style.transform = `rotate(${randomAngle}deg)`;
+
+                setTimeout(() => {
+                    alert(`Winner: ${items[winningIndex]}`);
+                    isSpinning = false;
+                    roulette.style.transition = 'none';
+                    roulette.style.transform = 'rotate(0deg)';
+                }, 3000);
+            });
+
+            document.getElementById('clear').addEventListener('click', () => {
+                items = [];
+                saveToLocalStorage();
+                updateRoulette();
+                updateItemsList();
+            });
+
+            // Initial render
+            updateRoulette();
+            updateItemsList();
+        });
+    </script>
+</body>
+
+</html>

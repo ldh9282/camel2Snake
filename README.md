@@ -48,3 +48,13 @@ select 쿼리 (스네이크 별칭)
 ```bash
 start http://localhost:3000 & node server.js [로그파일]
 ```
+
+## roulette
+
+기능상세
+
+1. 룰렛 돌리기
+
+2. 항목추가, 항목 삭제, 원판 영역 클릭후 항목 수정
+
+3. 로컬 스토리지에 항목 목록 저장
